@@ -4,7 +4,7 @@ Sample REST server to demonstrate good Fabric Node SDK practices.
 
 The REST API is only intended to work with the [basic asset transfer example](https://github.com/hyperledger/fabric-samples/tree/main/asset-transfer-basic).
 
-To install the basic asset transfer chaincode on a local Fabric network, follow the [Using the Fabric test network](https://hyperledger-fabric.readthedocs.io/en/release-2.4/test_network.html) tutorial.
+To install the basic asset transfer chaincode on a local Fabric network, follow the [Using the Fabric test network](https://hyperledger-fabric.readthedocs.io/en/release-2.4/test_network.html) tutorial. You need to go at least as far as the step where the ledger gets initialized with assets.
 
 ## Overview
 
@@ -121,6 +121,7 @@ TEST_NETWORK_HOME=$HOME/fabric-samples/test-network npm run generateEnv
 Start a Redis server (Redis is used to store the queue of submit transactions)
 
 ```shell
+export REDIS_PASSWORD=$(uuidgen)
 npm run start:redis
 ```
 
@@ -132,13 +133,9 @@ npm run start:dev
 
 ### Docker image
 
-Alternatively, run the following commands in the `fabric-rest-sample/asset-transfer-basic/rest-api-typescript` directory to start the sample in a Docker container
+It's also possible to use the [published docker image](https://github.com/hyperledger/fabric-samples/pkgs/container/fabric-rest-sample) to run the sample
 
-Build the Docker image
-
-```shell
-docker build -t fabric-rest-sample .
-```
+Clone the `fabric-samples` repository and change to the `fabric-samples/asset-transfer-basic/rest-api-typescript` directory before running the following commands
 
 Create a `.env` file to configure the server for the test network (make sure `TEST_NETWORK_HOME` is set to the fully qualified `test-network` directory and `AS_LOCAL_HOST` is set to `false` so that the server works inside the Docker Compose network)
 
@@ -151,6 +148,7 @@ TEST_NETWORK_HOME=$HOME/fabric-samples/test-network AS_LOCAL_HOST=false npm run 
 Start the sample REST server and Redis server
 
 ```shell
+export REDIS_PASSWORD=$(uuidgen)
 docker-compose up -d
 ```
 

@@ -25,6 +25,7 @@ function load_docker_images() {
   kind load docker-image ${FABRIC_CONTAINER_REGISTRY}/fabric-peer:$FABRIC_VERSION
   kind load docker-image ${FABRIC_CONTAINER_REGISTRY}/fabric-tools:$FABRIC_VERSION
   kind load docker-image ghcr.io/hyperledgendary/fabric-ccaas-asset-transfer-basic:latest
+  kind load docker-image couchdb:3.2.1
   
   pop_fn 
 }
@@ -37,6 +38,19 @@ function apply_nginx_ingress() {
   # It may be preferable to always load from the remote mainline?
   # kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
   kubectl apply -f kube/ingress-nginx.yaml
+
+  pop_fn
+}
+
+function install_cert_manager() {
+  push_fn "Installing cert-manager"
+
+    # Install cert-manager to manage TLS certificates
+  kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.6.1/cert-manager.yaml
+
+  kubectl -n cert-manager rollout status deploy/cert-manager
+  kubectl -n cert-manager rollout status deploy/cert-manager-cainjector
+  kubectl -n cert-manager rollout status deploy/cert-manager-webhook
 
   pop_fn
 }
@@ -137,6 +151,7 @@ function kind_init() {
 
   kind_create
   apply_nginx_ingress
+  install_cert_manager
   launch_docker_registry
 
   if [ "${STAGE_DOCKER_IMAGES}" == true ]; then
